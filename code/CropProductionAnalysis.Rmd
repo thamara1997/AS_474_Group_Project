@@ -1,0 +1,96 @@
+---
+title: "CropProductionAnalysis"
+output: html_document
+date: "2023-07-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+df <- read.csv("/cloud/project/data/Crop_production.csv", header = TRUE)
+
+```
+
+
+```{r}
+attach(Crop_production)
+```
+
+##Data Cleaning
+
+```{r}
+# Data set Cleaning
+
+head(Crop_production)
+str(Crop_production)
+sum(duplicated(Crop_production))
+
+colSums(is.na(Crop_production))
+
+#There are no missing values
+
+#Delete First Column and finalize Dataset
+Crop_production_india <- Crop_production[, -1]
+attach(Crop_production_india)
+View(Crop_production_india)
+
+```
+
+```{r}
+#Factorize
+
+Crop_production_india$State_Name <- as.factor(Crop_production_india$State_Name)
+Crop_production_india$Crop_Type <- as.factor(Crop_production_india$Crop_Type)
+Crop_production_india$Crop <- as.factor(Crop_production_india$Crop)
+str(Crop_production_india)
+
+write.csv(Crop_production_india, "Cleaned_Crop_Production.csv", row.names = FALSE)
+
+```
+
+##Data Analysing 
+
+1.	Count the number of observations for each state to understand the distribution of data across different states.
+
+```{r}
+state_counts <- table(Crop_production_india$State_Name)
+print(state_counts)
+
+```
+
+2.Create a pie chart to visualize the proportion of observations from each state.
+
+```{r}
+library(ggplot2)
+
+state_counts <- table(df$State_Name)
+
+# Convert the table to a data frame
+state_counts_df <- as.data.frame(state_counts)
+
+# Add a column for State_Name
+state_counts_df$State_Name <- rownames(state_counts_df)
+
+# Rename the count column
+colnames(state_counts_df) <- c("State_Name", "Count")
+
+# Sort the data frame by the count in descending order
+state_counts_df <- state_counts_df[order(state_counts_df$Count, decreasing = TRUE), ]
+
+# Create a bar chart
+ggplot(state_counts_df, aes(x = State_Name, y = Count, fill = State_Name)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  labs(x = "State", y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "none")  +
+  ggtitle("Number of Observations by State") +
+  coord_flip()
+
+
+```
+
+
+
+
