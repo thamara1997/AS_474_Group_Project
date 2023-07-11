@@ -65,7 +65,7 @@ print(state_counts)
 ```{r}
 library(ggplot2)
 
-state_counts <- table(df$State_Name)
+state_counts <- table(Crop_production_india$State_Name)
 
 # Convert the table to a data frame
 state_counts_df <- as.data.frame(state_counts)
@@ -91,6 +91,280 @@ ggplot(state_counts_df, aes(x = State_Name, y = Count, fill = State_Name)) +
 
 ```
 
+3.Determine the frequency of different crop types in the dataset using a bar plot.
+
+```{r}
+crop_frequency <- table(Crop_production_india$Crop_Type)
+
+# Convert the table to a data frame
+crop_frequency_df <- as.data.frame(crop_frequency)
+
+#add a column for Crop_Type
+crop_frequency_df$Crop_Type <- rownames(crop_frequency_df)
+
+# Rename the count column
+colnames(crop_frequency_df) <- c("Crop_Type", "Frequency")
+
+# Sort the data frame by the count in descending order
+crop_frequency_df <- crop_frequency_df[order(crop_frequency_df$Frequency, decreasing = TRUE), ]
+
+# Create a bar chart
+library(ggplot2)
+
+ggplot(crop_frequency_df, aes(x = Crop_Type, y = Frequency, fill = Crop_Type)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Crop Type", y = "Frequency") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  ggtitle("Crop Type Frequencies")
 
 
+```
+4. Explore the distribution of crop types across states using a bar plot
+
+```{r}
+#Calculate the frequency of each crop type for each state using the table function.
+crop_state_frequency <- table(Crop_production_india$State_Name, Crop_production_india$Crop_Type)
+
+#Convert the table to a data frame
+crop_state_frequency_df <- as.data.frame(crop_state_frequency)
+
+#Create a barplot
+library(ggplot2)
+
+ggplot(crop_state_frequency_df, aes(x = Var1, y = Freq, fill = Var2)) +
+  geom_bar(stat = "identity") +
+  labs(x = "State", y = "Frequency", fill = "Crop Type") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  ggtitle("Crop Type Distribution across States")
+
+
+```
+5.Analyze the frequency distribution of different crops using a table?
+
+```{r}
+#Calculate the frequency of each crop using the table() function:
+crop_frequency <- table(Crop_production_india$Crop)
+
+#Convert the table to a data frame:
+crop_frequency_df2 <- as.data.frame(crop_frequency)
+
+#Sort the data frame by frequency in descending order:
+crop_frequency_df2 <- crop_frequency_df2[order(crop_frequency_df2$Freq, decreasing = TRUE), ]
+
+print(crop_frequency_df2);
+
+```
+6. Investigate the top crops produced by considering the production volume.
+
+```{r}
+#Calculate the total production volume for each crop using the aggregate() function:
+crop_production <- aggregate(Production_in_tons ~ Crop, data = Crop_production_india, FUN = sum)
+
+#Sort the data frame by production volume in descending order:
+crop_production <- crop_production[order(crop_production$Production_in_tons, decreasing = TRUE), ]
+
+#Create a bar plot
+library(ggplot2)
+
+ggplot(crop_production, aes(x = Crop, y = Production_in_tons,fill = Crop)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Crop", y = "Production Volume (tons)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  ggtitle("Top Crops by Production Volume")+
+  theme(legend.key.size = unit(0.3, "cm"))+
+  theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 1))  # Adjust the size   and angle of x-axis labels
+
+```
+
+
+7.Generate summary statistics (mean, median, standard deviation) for each nutrient and pH level.
+
+```{r}
+
+# Calculate summary statistics for columns N, P, K, and pH
+summary_stats <- summary(Crop_production_india[c("N", "P", "K", "pH")])
+
+# Print the summary statistics
+print(summary_stats)
+
+```
+
+
+8.Analyze the relationships between different nutrient levels (N, P, K) and pH
+
+```{r}
+library(ggplot2)
+
+# Create scatter plots to analyze relationships
+ggplot(df, aes(x = N, y = pH)) +
+  geom_point() +
+  labs(x = "N", y = "pH") +
+  ggtitle("Relationship between N and pH")
+
+ggplot(df, aes(x = P, y = pH)) +
+  geom_point() +
+  labs(x = "P", y = "pH") +
+  ggtitle("Relationship between P and pH")
+
+ggplot(df, aes(x = K, y = pH)) +
+  geom_point() +
+  labs(x = "K", y = "pH") +
+  ggtitle("Relationship between K and pH")
+
+
+
+```
+
+9.Showing the relationships between the variables in correlation matrix.
+
+```{r}
+cor_matrix <- cor(Crop_production_india[, c("N", "P", "K", "pH")])
+
+print(cor_matrix)
+```
+
+10. Examine the distribution of rainfall using a histogram plot.
+
+```{r}
+#plot histogram
+library(ggplot2)
+
+
+# Create a colored histogram with a specific x-axis range
+ggplot(Crop_production_india, aes(x = rainfall, fill =after_stat(count))) +
+  geom_histogram(binwidth = 100, color = "black") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(x = "Rainfall (mm)", y = "Frequency") +
+  ggtitle("Distribution of Rainfall") +
+  theme_minimal() +
+  scale_x_continuous(limits = c(0, 1000), breaks = seq(0, 1000, 100))
+
+
+```
+11. Investigate the relationship between rainfall and crop production using a line plot.
+
+```{r}
+library(ggplot2)
+
+# Create a line plot for rainfall and crop production
+ggplot(Crop_production_india, aes(x = rainfall, y = Production_in_tons)) +
+  geom_line() +
+  labs(x = "Rainfall (mm)", y = "Crop Production (tons)") +
+  ggtitle("Relationship between Rainfall and Crop Production") +
+  theme_minimal()+
+  scale_x_continuous(limits = c(0, 1000), breaks = seq(0, 1000, 100))
+
+```
+
+12. Explore the distribution of temperature using a density plot.
+
+```{r}
+library(ggplot2)
+
+# Create a density plot for temperature
+ggplot(Crop_production_india, aes(x = temperature)) +
+  geom_density(fill = "lightblue", color = "black") +
+  labs(x = "Temperature", y = "Density") +
+  ggtitle("Distribution of Temperature") +
+  theme_minimal()
+
+```
+
+13. Analyze the impact of temperature on crop yield using a line plot.
+
+```{r}
+library(ggplot2)
+
+# Create a scatter plot for temperature and crop yield
+ggplot(Crop_production_india, aes(x = temperature, y = Yield_ton_per_hec)) +
+  geom_line() +
+  labs(x = "Temperature", y = "Crop Yield (tons/hectare)") +
+  ggtitle("Impact of Temperature on Crop Yield") +
+  theme_minimal() +
+  scale_x_continuous(limits = c(0, 40), breaks = seq(0, 40, 2))
+
+```
+
+14. Calculate summary statistics for the cultivated area (mean, median, and range)
+
+```{r}
+# Calculate summary statistics for cultivated area
+cultivated_area <- Crop_production_india$Area_in_hectares
+
+# Calculate mean
+mean_area <- mean(cultivated_area)
+
+# Calculate median
+median_area <- median(cultivated_area)
+
+# Calculate range
+range_area <- range(cultivated_area)
+
+# Print the summary statistics
+cat("Mean Area(Hectares)    : ", mean_area, "\n")
+cat("Median Area(Hectares)  : ", median_area, "\n")
+cat("Range of Area(Hectares): ", range_area[1], " - ", range_area[2], "\n")
+
+```
+
+15. Visualize the distribution of cultivated areas using a histogram.
+
+```{r}
+library(ggplot2)
+
+# Create a histogram for cultivated areas
+ggplot(Crop_production_india, aes(x = Area_in_hectares)) +
+  geom_histogram(binwidth = 1000, fill = "lightblue", color = "black") +
+  labs(x = "Cultivated Area (Hectares)", y = "Frequency") +
+  ggtitle("Distribution of Cultivated Areas") +
+  theme_minimal()
+
+
+```
+
+16. Analyze the distribution of crop production using a density plot.
+
+```{r}
+library(ggplot2)
+
+# Create a density plot for crop production
+ggplot(Crop_production_india, aes(x = Production_in_tons)) +
+  geom_density(fill = "lightgreen", color = "black") +
+  labs(x = "Crop Production (tons)", y = "Density") +
+  ggtitle("Distribution of Crop Production") +
+  theme_minimal()+
+  scale_x_log10()
+
+```
+
+17. Investigate the relationship between production and other variables using scatter plots or correlation analysis.
+
+```{r}
+# Select the variables of interest for the analysis
+variables_of_interest <- c("Production_in_tons", "N", "P", "K", "pH", "rainfall", "temperature")
+
+# Subset the data frame with the selected variables
+subset_data <- Crop_production_india[, variables_of_interest]
+
+# Create a scatter plot matrix
+pairs(subset_data)
+
+```
+
+18. Examine the distribution of crop yield using a density plot.
+
+```{r}
+library(ggplot2)
+
+# Create a histogram for crop yield
+ggplot(Crop_production_india, aes(x = Yield_ton_per_hec)) +
+  geom_histogram(binwidth = 0.5, fill = "pink", color = "black") +
+  labs(x = "Crop Yield (tons/hectare)", y = "Frequency") +
+  ggtitle("Distribution of Crop Yield") +
+  theme_minimal()+
+  scale_x_log10()
+
+```
 
